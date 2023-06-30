@@ -2,11 +2,11 @@ from rest_framework import serializers
 from rest_framework.fields import ReadOnlyField
 
 from Masters.models import State, District, City, Country, Branch, Religion, Caste, SubCaste, Occupation, Education, \
-	Language, Source, MemberShip, Agent
+	Language, Source, MemberShip, Agent, Customer
 from Users.serializers import UserCommonSerializer
 from Users.models import User
 from Masters.models import Staff
-
+from django.contrib.auth.models import AnonymousUser
 class CountrySerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Country
@@ -185,3 +185,18 @@ class AgentSerializer(serializers.ModelSerializer):
 		user = User.objects.create(**user_data)
 		agent = Agent.objects.create(user=user,**validate_data)
 		return agent
+
+class CustomerSerializer(serializers.ModelSerializer):
+	user = UserCommonSerializer()
+	# education_name = ReadOnlyField(source='education.name')
+	class Meta:
+		model = Customer
+		fields = '__all__'
+
+	def create(self,validate_data):
+		user_data = validate_data.pop('user')
+		user_data['createdby'] = None
+		user_data['modifiedby'] = None
+		user = User.objects.create(**user_data)
+		customer = Customer.objects.create(user=user,**validate_data)
+		return customer

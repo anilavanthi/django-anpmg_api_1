@@ -363,6 +363,29 @@ class Agent(models.Model):
         return self.name
 
 
+class Customer(models.Model):
+    id = models.AutoField(primary_key=True, auto_created=True)
+    gender = models.CharField(max_length=15, null=True, blank=True)
+    # maritalStatus = models.CharField(max_length=15, null=True, blank=True)
+    # education = models.ForeignKey('Masters.Education', related_name='agent', on_delete=models.RESTRICT, null=True,blank=True)
+    # aadharno = models.CharField(max_length=15, null=True, blank=True)
+    # dob = models.CharField(max_length=50, null=True, blank=True)
+    # bankaccno= models.CharField(max_length=15, null=True, blank=True)
+    # bankname = models.CharField(max_length=50,  null=True, blank=True)
+    # bankifsccode = models.CharField(max_length=15,  null=True, blank=True)
+    # bankbranchname = models.CharField(max_length=50, null=True, blank=True)
+    user = models.ForeignKey(User, related_name='customer_users', on_delete=models.RESTRICT, null=True)
+    createdon = models.DateTimeField(auto_now_add=True, blank=True)
+    createdby = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='customercreated', on_delete=models.RESTRICT, null=True)
+    modifiedon = models.DateTimeField(blank=True, null=True, auto_now=True)
+    modifiedby = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='customerupdated', on_delete=models.RESTRICT,  null=True)
+    status = models.SmallIntegerField(default=1, null=True)
+    # photo = models.ImageField(upload_to=agents_upload_to,default='blank_pic',  blank=True, null=True)
+    def save(self, *args, **kwargs):
+        super(Customer, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
     
 
 

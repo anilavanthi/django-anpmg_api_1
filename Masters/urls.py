@@ -61,5 +61,9 @@ urlpatterns = [
     path('agent/<int:id>', views.AgentRegisterView.as_view(), name="agentListDelete"),
     path('agentUser/<int:id>', views.AgentUserView.as_view(), name="agentUser"),
 
+    path('customer/', views.CustomerRegisterView.as_view(), name="customerAddUpdateList"),
+    # path('customer/<int:id>', views.CustomerRegisterView.as_view(), name="customerListDelete"),
+    # path('customerUser/<int:id>', views.CustomerUserView.as_view(), name="customerUser"),
+
 ]
 

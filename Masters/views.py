@@ -10,15 +10,17 @@ from rest_framework.response import Response
 from rest_framework import generics, status, views, permissions
 from django.contrib.auth.hashers import make_password
 from Masters.models import Country, State, District, City, Branch, Religion, Caste, SubCaste, Occupation, Education, \
-    Language, Source, Staff, MemberShip, Agent
+    Language, Source, Staff, MemberShip, Agent, Customer
 from Users.models import User
 from Masters.serializers import StateSerializer, DistrictSerializer, CitySerializer, CountrySerializer, \
     BranchSerializer, ReligionSerializer, \
-    CasteSerializer, SubCasteSerializer, OccupationSerializer, EducationSerializer, LanguageSerializer, SourceSerializer, StaffSerializer, \
-    MemberShipSerializer,AgentSerializer
+    CasteSerializer, SubCasteSerializer, OccupationSerializer, EducationSerializer, LanguageSerializer, \
+    SourceSerializer, StaffSerializer, \
+    MemberShipSerializer, AgentSerializer, CustomerSerializer
 
 from Users.serializers import UserCommonSerializer
 
+from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 
 class CountryRegisterView(generics.ListCreateAPIView):
@@ -1295,3 +1297,28 @@ class AgentUserView(generics.ListCreateAPIView):
         agentall = Agent.objects.all()
         serializer = AgentSerializer(agentall, many=True)
         return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+
+class CustomerRegisterView(generics.ListCreateAPIView):
+    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = CustomerSerializer
+    customer = Customer.objects.all()
+    users = User.objects.all()
+
+    def post(self, request, *args, **kwargs):
+        # parser_classes = (MultiPartParser, FormParser)
+        # photo = request.FILES["photo"]
+        data = json.loads(request.data['data'])
+        passwordNew = make_password(data['user']['password'])
+        data['user']['password'] = passwordNew
+        # original_filename, extension = os.path.splitext(photo.name)
+        # photo.name =data['user']['username'] + extension
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        # agent = serializer.save(photo=photo)
+        customer = serializer.save()
+        return Response({
+            "customer": CustomerSerializer(customer, context=self.get_serializer_context()).data,
+            "message": "Customer created successfully"
+        })
