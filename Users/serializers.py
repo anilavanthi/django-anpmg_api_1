@@ -144,6 +144,8 @@ class LoginSerializer(serializers.ModelSerializer):
             return 'Teacher'
         elif user.is_branch:
             return 'Branch'
+        elif user.is_customer:
+            return 'Customer'
     
 
     class Meta:
@@ -227,6 +229,8 @@ class LoginSerializer(serializers.ModelSerializer):
         elif user.is_agent == True:
             userValue=True
         elif user.is_branch == True:
+            userValue=True
+        elif user.is_customer == True:
             userValue=True
 
         if not userValue == True and not ((device.type != 3 and ( user.deviceaccess == 1 or user.deviceaccess == 3)) or (device.type == 3 and ( user.deviceaccess == 2 or user.deviceaccess == 3)) ):
