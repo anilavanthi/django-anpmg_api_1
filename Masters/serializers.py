@@ -200,3 +200,12 @@ class CustomerSerializer(serializers.ModelSerializer):
 		user = User.objects.create(**user_data)
 		customer = Customer.objects.create(user=user,**validate_data)
 		return customer
+
+	def update(self, instance, validated_data):
+		user_data = validated_data.pop('user', None)
+		if user_data:
+			user_serializer = self.fields['user']
+			user_instance = instance.user
+			user_serializer.update(user_instance, user_data)
+
+		return super().update(instance, validated_data)

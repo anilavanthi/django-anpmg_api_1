@@ -31,9 +31,12 @@ import jwt
 
 
 class UserCommonSerializer(serializers.ModelSerializer):
+    country_name = ReadOnlyField(source='country.name')
     state_name = ReadOnlyField(source='state.name')
     district_name = ReadOnlyField(source='district.name')
     city_name = ReadOnlyField(source='city.name')
+    password = serializers.CharField(write_only=True, required=False)
+    username = serializers.CharField(write_only=True, required=False)
     class Meta:
         model = User
         # fields = ('username','email','phone','first_name','last_name','state','district','city','address')

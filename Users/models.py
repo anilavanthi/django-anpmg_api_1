@@ -54,6 +54,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     otp = models.CharField(max_length=6, blank=True, null=True)
     first_name = models.CharField( max_length=150, blank=True)
     last_name = models.CharField( max_length=150, blank=True)
+    country = models.ForeignKey('Masters.Country', related_name='users', on_delete=models.RESTRICT, null=True, blank=True)
     state = models.ForeignKey('Masters.State', related_name='users', on_delete=models.RESTRICT, null=True, blank=True)
     district = models.ForeignKey('Masters.District', related_name='users', on_delete=models.RESTRICT, null=True, blank=True)
     city = models.ForeignKey('Masters.City', related_name='users', on_delete=models.RESTRICT, null=True, blank=True)

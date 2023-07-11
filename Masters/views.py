@@ -1322,3 +1322,35 @@ class CustomerRegisterView(generics.ListCreateAPIView):
             "customer": CustomerSerializer(customer, context=self.get_serializer_context()).data,
             "message": "Customer created successfully"
         })
+
+class CustomerUserView(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = (permissions.AllowAny,)
+    serializer_class = CustomerSerializer
+    customer = Customer.objects.all()
+    users = User.objects.all()
+
+    def get(self, request, id=None):
+        if id:
+            customer = Customer.objects.get(user_id=id)
+            serializer = CustomerSerializer(customer)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+        customerall = Customer.objects.all()
+        serializer = CustomerSerializer(customerall, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+    def put(self, request, id=None):
+        try:
+            customer = Customer.objects.get(pk=id)
+        except Customer.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        data = json.loads(request.data['data'])
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.update(customer, serializer.validated_data)
+        return Response({
+            "customer": CustomerSerializer(customer, context=self.get_serializer_context()).data,
+            "message": "Customer updated successfully"
+        })
+
