@@ -1323,6 +1323,7 @@ class CustomerRegisterView(generics.ListCreateAPIView):
             "message": "Customer created successfully"
         })
 
+
 class CustomerUserView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     # permission_classes = (permissions.AllowAny,)
@@ -1354,3 +1355,45 @@ class CustomerUserView(generics.ListCreateAPIView):
             "message": "Customer updated successfully"
         })
 
+class LoginCustomerRegisterView(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = (permissions.AllowAny,)
+    serializer_class = CustomerSerializer
+    customer = Customer.objects.all()
+    users = User.objects.all()
+
+    def post(self, request, *args, **kwargs):
+        # parser_classes = (MultiPartParser, FormParser)
+        # photo = request.FILES["photo"]
+        data = json.loads(request.data['data'])
+        passwordNew = make_password(data['user']['password'])
+        data['user']['password'] = passwordNew
+        # original_filename, extension = os.path.splitext(photo.name)
+        # photo.name =data['user']['username'] + extension
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        # agent = serializer.save(photo=photo)
+        customer = serializer.save()
+        return Response({
+            "customer": CustomerSerializer(customer, context=self.get_serializer_context()).data,
+            "message": "Customer created successfully"
+        })
+
+
+
+class CustomerUserViewBasedLogin(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = (permissions.AllowAny,)
+    serializer_class = CustomerSerializer
+    customer = Customer.objects.all()
+    users = User.objects.all()
+
+    def get(self, request, id=None):
+        # if id:
+        #     customer = Customer.objects.filter(createdby=id)
+        #     serializer = CustomerSerializer(customer)
+        #     return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+        customerall = Customer.objects.all().filter(createdby=id)
+        serializer = CustomerSerializer(customerall, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
