@@ -1363,22 +1363,34 @@ class LoginCustomerRegisterView(generics.ListCreateAPIView):
     users = User.objects.all()
 
     def post(self, request, *args, **kwargs):
-        # parser_classes = (MultiPartParser, FormParser)
-        # photo = request.FILES["photo"]
+        parser_classes = (MultiPartParser, FormParser)
+        photo = request.FILES["photo"]
+        idproof = request.FILES["idproof"]
         data = json.loads(request.data['data'])
         passwordNew = make_password(data['user']['password'])
         data['user']['password'] = passwordNew
-        # original_filename, extension = os.path.splitext(photo.name)
-        # photo.name =data['user']['username'] + extension
+        original_filename, extension = os.path.splitext(photo.name)
+        photo.name =data['user']['username'] + extension
+        original_filename, extension = os.path.splitext(idproof.name)
+        idproof.name = data['user']['username'] + extension
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
-        # agent = serializer.save(photo=photo)
-        customer = serializer.save()
+        customer = serializer.save(photo=photo,idproof=idproof)
+        # customer = serializer.save()
         return Response({
             "customer": CustomerSerializer(customer, context=self.get_serializer_context()).data,
             "message": "Customer created successfully"
         })
 
+    def get(self, request, id=None):
+        if id:
+            customer = Customer.objects.get(id=id)
+            serializer = CustomerSerializer(customer)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+        customerall = Customer.objects.all()
+        serializer = CustomerSerializer(customerall, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
 
 
 class CustomerUserViewBasedLogin(generics.ListCreateAPIView):
@@ -1397,3 +1409,17 @@ class CustomerUserViewBasedLogin(generics.ListCreateAPIView):
         customerall = Customer.objects.all().filter(createdby=id)
         serializer = CustomerSerializer(customerall, many=True)
         return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+    def delete(self, request, id=None):
+        try:
+            customer = Customer.objects.get(id=id)
+            photo_path = customer.photo.url
+            self.customer.filter(id=id).delete()
+            self.users.filter(id=customer.user_id).delete()
+            status_code = status.HTTP_200_OK
+            response = {'status': 'success', 'status_code': status_code, 'message': 'customer deleted successfully'}
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        'message': str(error)}
+        return Response(response, status=status_code)
