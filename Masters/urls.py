@@ -36,6 +36,7 @@ urlpatterns = [
 
     path('subcaste/', views.SubCasteRegisterView.as_view(), name="subcasteAddUpdateList"),
     path('subcaste/<int:id>', views.SubCasteRegisterView.as_view(), name="subcasteListDelete"),
+    path('subcastecastes/<int:id>', views.SubCasteCasteView.as_view(), name="subcasteListCastes"),
 
     path('occupation/', views.OccupationRegisterView.as_view(), name="occupationAddUpdateList"),
     path('occupation/<int:id>', views.OccupationRegisterView.as_view(), name="occupationListDelete"),

@@ -190,7 +190,8 @@ class CustomerSerializer(serializers.ModelSerializer):
 	user = UserCommonSerializer()
 	createdby_id = serializers.ReadOnlyField(source='createdby.id')
 	createdby_username = serializers.ReadOnlyField(source='createdby.username')
-	# education_name = ReadOnlyField(source='education.name')
+	education_name = ReadOnlyField(source='education.name')
+	source_name = ReadOnlyField(source='source.name')
 	# createdby_name = ReadOnlyField(source='user.username')
 	class Meta:
 		model = Customer

@@ -739,6 +739,21 @@ class SubCasteRegisterView(generics.ListCreateAPIView):
                         'message': str(error)}
         return Response(response, status=status_code)
 
+class SubCasteCasteView(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = (permissions.AllowAny,)
+    serializer_class = SubCasteSerializer
+    subcastes = SubCaste.objects.all()
+
+    def get(self,request,id=None):
+        if id:
+            subcastes = SubCaste.objects.filter(caste=id)
+            serializer = SubCasteSerializer(subcastes,many=True)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+        subcastes = SubCaste.objects.all()
+        serializer = SubCasteSerializer(subcastes, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
 
 class OccupationRegisterView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
