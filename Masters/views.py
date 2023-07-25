@@ -1378,24 +1378,39 @@ class LoginCustomerRegisterView(generics.ListCreateAPIView):
     users = User.objects.all()
 
     def post(self, request, *args, **kwargs):
-        parser_classes = (MultiPartParser, FormParser)
-        photo = request.FILES["photo"]
-        idproof = request.FILES["idproof"]
-        data = json.loads(request.data['data'])
-        passwordNew = make_password(data['user']['password'])
-        data['user']['password'] = passwordNew
-        original_filename, extension = os.path.splitext(photo.name)
-        photo.name =data['user']['username'] + extension
-        original_filename, extension = os.path.splitext(idproof.name)
-        idproof.name = data['user']['username'] + extension
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        customer = serializer.save(photo=photo,idproof=idproof)
-        # customer = serializer.save()
-        return Response({
-            "customer": CustomerSerializer(customer, context=self.get_serializer_context()).data,
-            "message": "Customer created successfully"
-        })
+        try:
+            parser_classes = (MultiPartParser, FormParser)
+            photo = request.FILES["photo"]
+            idproof = request.FILES["idproof"]
+            data = json.loads(request.data['data'])
+            passwordNew = make_password(data['user']['password'])
+            data['user']['password'] = passwordNew
+            original_filename, extension = os.path.splitext(photo.name)
+            photo.name =data['user']['username'] + extension
+            original_filename, extension = os.path.splitext(idproof.name)
+            idproof.name = data['user']['username'] + extension
+            serializer = self.get_serializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            customer = serializer.save(photo=photo,idproof=idproof)
+            # customer = serializer.save()
+            status_code = status.HTTP_200_OK
+            response = {
+                "data": CustomerSerializer(customer, context=self.get_serializer_context()).data,
+                "status_code": status_code,
+                "message": "Customer created successfully"
+            }
+            # return Response({
+            #     "customer": CustomerSerializer(customer, context=self.get_serializer_context()).data,
+            #     "message": "Customer created successfully"
+            # })
+        except Exception as error:
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            response = {'status': 'failure', 'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        'message': str(error)}
+        return Response(response, status=status_code)
+
+
+
 
     def get(self, request, id=None):
         if id:
