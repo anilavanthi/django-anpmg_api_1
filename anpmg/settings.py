@@ -131,7 +131,7 @@ DATABASES = {
         'NAME': 'anmpg_data',
         'USER': 'root',
         'PASSWORD': 'vanesh143',
-        'HOST': 'localhost',
+        'HOST': 'anpmg.cjrz65x7iinf.ap-south-1.rds.amazonaws.com',
         'PORT': '3306',
         'TEST':{
             'ENGINE': 'django.db.backends.sqlite3',
